@@ -1,0 +1,292 @@
+/* -----------------------------------------------------------------------
+   FretWise — base styles
+   Dark background, single accent color, big text meant to be read from
+   across a room. No CSS framework.
+------------------------------------------------------------------------ */
+
+:root {
+  --bg: #0f1115;
+  --surface: #181b22;
+  --surface-2: #21252f;
+  --text: #eef1f6;
+  --text-dim: #8891a3;
+  --accent: #4fc3f7;       /* single accent color, used for active/neutral UI */
+  --good: #3ddc84;         /* in-tune green */
+  --sharp-color: #ff8a4c;  /* too high */
+  --flat-color: #ffd54c;   /* too low */
+  --border: #2a2f3a;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+}
+
+.app-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.app-header h1 {
+  margin: 0;
+  font-size: 1.4rem;
+  letter-spacing: 0.02em;
+  color: var(--accent);
+}
+
+.tabs {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.tab-btn {
+  background: var(--surface);
+  color: var(--text-dim);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.tab-btn.active {
+  color: var(--bg);
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+.tab-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.4;
+}
+
+main {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 1.5rem 1.25rem 3rem;
+}
+
+.view {
+  display: none;
+}
+
+.view.active {
+  display: block;
+}
+
+/* ---------- mic controls ---------- */
+
+.mic-controls {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 2rem;
+}
+
+.primary-btn {
+  background: var(--accent);
+  color: #06232f;
+  border: none;
+  border-radius: 999px;
+  padding: 0.9rem 2.2rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.primary-btn:hover {
+  filter: brightness(1.08);
+}
+
+.status-text {
+  color: var(--text-dim);
+  font-size: 0.95rem;
+  margin: 0;
+}
+
+/* ---------- tuner display ---------- */
+
+.tuner-display {
+  background: var(--surface);
+  border: 2px solid var(--border);
+  border-radius: 20px;
+  padding: 2rem 1.5rem;
+  text-align: center;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.tuner-display.in-tune {
+  border-color: var(--good);
+  box-shadow: 0 0 40px -8px var(--good);
+}
+
+.tuner-display.sharp {
+  border-color: var(--sharp-color);
+}
+
+.tuner-display.flat {
+  border-color: var(--flat-color);
+}
+
+.note-name {
+  font-size: clamp(4.5rem, 22vw, 8rem);
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+
+.tuner-display.in-tune .note-name {
+  color: var(--good);
+}
+
+.tuner-display.sharp .note-name {
+  color: var(--sharp-color);
+}
+
+.tuner-display.flat .note-name {
+  color: var(--flat-color);
+}
+
+.frequency {
+  margin-top: 0.5rem;
+  font-size: clamp(1.1rem, 4vw, 1.5rem);
+  color: var(--text-dim);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- cents meter ---------- */
+
+.cents-meter {
+  margin-top: 2rem;
+}
+
+.cents-scale {
+  display: flex;
+  justify-content: space-between;
+  color: var(--text-dim);
+  font-size: 0.85rem;
+  margin-bottom: 0.35rem;
+}
+
+.cents-track {
+  position: relative;
+  height: 14px;
+  background: var(--surface-2);
+  border-radius: 999px;
+  overflow: visible;
+}
+
+.cents-center-line {
+  position: absolute;
+  left: 50%;
+  top: -6px;
+  bottom: -6px;
+  width: 2px;
+  background: var(--border);
+  transform: translateX(-50%);
+}
+
+.cents-needle {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--accent);
+  transform: translate(-50%, -50%);
+  transition: left 0.08s linear, background 0.15s ease;
+  box-shadow: 0 0 12px rgba(0, 0, 0, 0.4);
+}
+
+.in-tune .cents-needle {
+  background: var(--good);
+}
+
+.sharp .cents-needle {
+  background: var(--sharp-color);
+}
+
+.flat .cents-needle {
+  background: var(--flat-color);
+}
+
+.cents-value {
+  margin-top: 0.75rem;
+  font-size: clamp(1.1rem, 4vw, 1.4rem);
+  font-variant-numeric: tabular-nums;
+  color: var(--text-dim);
+}
+
+.in-tune .cents-value {
+  color: var(--good);
+}
+
+/* ---------- string reference row ---------- */
+
+.string-reference {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 0.5rem;
+  margin-top: 1.75rem;
+}
+
+.string-chip {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 0.6rem 0.25rem;
+  text-align: center;
+  color: var(--text-dim);
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.chip-note {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.chip-string {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.string-chip.active {
+  border-color: var(--accent);
+}
+
+.string-chip.active .chip-note {
+  color: var(--accent);
+}
+
+.string-chip.in-tune {
+  border-color: var(--good);
+}
+
+.string-chip.in-tune .chip-note {
+  color: var(--good);
+}
+
+@media (max-width: 480px) {
+  .string-reference {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}

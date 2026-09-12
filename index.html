@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FretWise</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <header class="app-header">
+    <h1>FretWise</h1>
+    <nav class="tabs">
+      <button class="tab-btn active" data-tab="tuner">Tuner</button>
+      <button class="tab-btn" data-tab="drill" disabled title="Coming soon">Fretboard Drill</button>
+      <button class="tab-btn" data-tab="timing" disabled title="Coming soon">Timing Trainer</button>
+      <button class="tab-btn" data-tab="log" disabled title="Coming soon">Practice Log</button>
+    </nav>
+  </header>
+
+  <main>
+    <section id="tuner-view" class="view active">
+      <div class="mic-controls">
+        <button id="mic-toggle" class="primary-btn">Start Tuner</button>
+        <p id="mic-status" class="status-text">Microphone off</p>
+      </div>
+
+      <div class="tuner-display" id="tuner-display">
+        <div class="note-name" id="note-name">&#8211;&#8211;</div>
+        <div class="frequency" id="frequency">0.0 Hz</div>
+
+        <div class="cents-meter">
+          <div class="cents-scale">
+            <span>&minus;50</span>
+            <span>0</span>
+            <span>+50</span>
+          </div>
+          <div class="cents-track">
+            <div class="cents-center-line"></div>
+            <div class="cents-needle" id="cents-needle"></div>
+          </div>
+          <div class="cents-value" id="cents-value">0 cents</div>
+        </div>
+      </div>
+
+      <div class="string-reference" id="string-reference"></div>
+    </section>
+  </main>
+
+  <script src="js/pitch-detect.js"></script>
+  <script src="js/notes.js"></script>
+  <script src="js/tuner.js"></script>
+</body>
+</html>
