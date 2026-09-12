@@ -9,6 +9,30 @@
 
 const IN_TUNE_CENTS = 5; // within +-5 cents counts as "in tune", per spec
 
+// Guitar and bass need different analysis settings because a bass string
+// vibrates much slower. Standard bass low E (E1, ~41 Hz) has almost exactly
+// half the frequency of guitar low E (E2, ~82 Hz) — so its period is twice
+// as long, and the analysis window has to be twice as long too, or there
+// wouldn't be enough repeated cycles inside it for autocorrelation to find
+// a confident match. minFreq/maxFreq are the range detectPitch() searches;
+// fftSize is the number of audio samples captured per analysis window.
+const INSTRUMENTS = {
+  guitar: {
+    tuning: STANDARD_TUNING,
+    minFreq: 70,
+    maxFreq: 1400,
+    fftSize: 2048, // ~43-46ms window, 3-4 periods of the lowest note (E2)
+  },
+  bass: {
+    tuning: BASS_TUNING,
+    minFreq: 35,
+    maxFreq: 500,
+    fftSize: 4096, // ~85-93ms window, 3-4 periods of the lowest note (E1)
+  },
+};
+
+let currentInstrument = 'guitar';
+
 let audioContext = null;
 let analyser = null;
 let micStream = null;
@@ -30,16 +54,40 @@ const centsValueEl = document.getElementById('cents-value');
 const centsNeedleEl = document.getElementById('cents-needle');
 const tunerDisplay = document.getElementById('tuner-display');
 const stringReferenceEl = document.getElementById('string-reference');
+const instrumentButtons = document.querySelectorAll('.instrument-btn');
 
 function buildStringReference() {
+  const tuning = INSTRUMENTS[currentInstrument].tuning;
   stringReferenceEl.innerHTML = '';
-  STANDARD_TUNING.forEach((s) => {
+  tuning.forEach((s) => {
     const chip = document.createElement('div');
     chip.className = 'string-chip';
     chip.id = `string-${s.string}`;
     chip.innerHTML = `<span class="chip-note">${s.note}${s.octave}</span><span class="chip-string">string ${s.string}</span>`;
     stringReferenceEl.appendChild(chip);
   });
+}
+
+// Switching instruments mid-session (even while the mic is listening) just
+// means: use a different tuning table for comparison, and — since a bass
+// string's lower pitch needs a longer analysis window — resize the buffer
+// we're pulling from the AnalyserNode. AnalyserNode.fftSize can be changed
+// on an already-connected node at any time, so there's no need to tear down
+// and rebuild the whole audio graph or ask for the microphone again.
+function selectInstrument(name) {
+  currentInstrument = name;
+  smoothedCents = 0;
+
+  instrumentButtons.forEach((btn) => {
+    btn.classList.toggle('active', btn.dataset.instrument === name);
+  });
+
+  if (analyser) {
+    analyser.fftSize = INSTRUMENTS[name].fftSize;
+    timeDomainBuffer = new Float32Array(analyser.fftSize);
+  }
+
+  buildStringReference();
 }
 
 async function startTuner() {
@@ -60,16 +108,12 @@ async function startTuner() {
   const source = audioContext.createMediaStreamSource(micStream);
   analyser = audioContext.createAnalyser();
 
-  // fftSize doubles as the length of the time-domain buffer we analyze.
-  // Guitar's lowest open string (E2, ~82 Hz) has a period of about 12ms; at
-  // a 44.1-48kHz sample rate that's roughly 530-580 samples. Autocorrelation
-  // needs several full periods inside the window to find real repetition,
-  // but a bigger window also means more lag between playing a note and
-  // seeing it on screen. 2048 samples (~43-46ms depending on the audio
-  // hardware's sample rate) holds 3-4 full periods of the lowest note,
-  // comfortably covers every note up through the high frets, and still
-  // updates fast enough to feel instant.
-  analyser.fftSize = 2048;
+  // fftSize doubles as the length of the time-domain buffer we analyze. See
+  // the INSTRUMENTS table above for how this is chosen per instrument: it
+  // needs to hold several full periods of that instrument's lowest note, but
+  // a bigger window also means more lag between playing a note and seeing it
+  // on screen, so we don't make it any bigger than each instrument needs.
+  analyser.fftSize = INSTRUMENTS[currentInstrument].fftSize;
   source.connect(analyser);
 
   timeDomainBuffer = new Float32Array(analyser.fftSize);
@@ -104,9 +148,10 @@ function stopTuner() {
 // (about a semitone) sounds and matters the same as the gap between 330Hz
 // and 350Hz, even though the second gap is a much bigger number of Hz.
 function closestString(frequency) {
-  let closest = STANDARD_TUNING[0];
+  const tuning = INSTRUMENTS[currentInstrument].tuning;
+  let closest = tuning[0];
   let smallestDiff = Infinity;
-  for (const s of STANDARD_TUNING) {
+  for (const s of tuning) {
     const diff = Math.abs(Math.log2(frequency / s.frequency));
     if (diff < smallestDiff) {
       smallestDiff = diff;
@@ -118,7 +163,8 @@ function closestString(frequency) {
 
 function updateLoop() {
   analyser.getFloatTimeDomainData(timeDomainBuffer);
-  const result = detectPitch(timeDomainBuffer, audioContext.sampleRate, 70, 1400);
+  const { minFreq, maxFreq } = INSTRUMENTS[currentInstrument];
+  const result = detectPitch(timeDomainBuffer, audioContext.sampleRate, minFreq, maxFreq);
 
   if (result) {
     const { frequency } = result;
@@ -166,3 +212,11 @@ micToggleBtn.addEventListener('click', () => {
     startTuner();
   }
 });
+
+instrumentButtons.forEach((btn) => {
+  btn.addEventListener('click', () => selectInstrument(btn.dataset.instrument));
+});
+
+// Build the guitar string chips immediately so the reference row isn't
+// empty before the user presses Start Tuner.
+buildStringReference();

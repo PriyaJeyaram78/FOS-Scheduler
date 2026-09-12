@@ -118,6 +118,32 @@ main {
   margin: 0;
 }
 
+/* ---------- instrument select ---------- */
+
+.instrument-select {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.instrument-btn {
+  background: var(--surface);
+  color: var(--text-dim);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 0.5rem 1.5rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.instrument-btn.active {
+  color: var(--bg);
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
 /* ---------- tuner display ---------- */
 
 .tuner-display {
@@ -240,7 +266,9 @@ main {
 
 .string-reference {
   display: grid;
-  grid-template-columns: repeat(6, 1fr);
+  /* auto-fit instead of a fixed column count so this works for both the
+     6-string guitar tuning and the 4-string bass tuning without extra JS */
+  grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
   gap: 0.5rem;
   margin-top: 1.75rem;
 }

@@ -56,3 +56,12 @@ const STANDARD_TUNING = [
   { string: 2, note: 'B', octave: 3, frequency: 246.94 },
   { string: 1, note: 'E', octave: 4, frequency: 329.63 },
 ];
+
+// Standard 4-string bass tuning — the same note names as a guitar's bottom
+// four strings, but pitched a full octave lower.
+const BASS_TUNING = [
+  { string: 4, note: 'E', octave: 1, frequency: 41.2 },
+  { string: 3, note: 'A', octave: 1, frequency: 55.0 },
+  { string: 2, note: 'D', octave: 2, frequency: 73.42 },
+  { string: 1, note: 'G', octave: 2, frequency: 98.0 },
+];
