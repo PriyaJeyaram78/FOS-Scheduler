@@ -30,9 +30,11 @@
     fetch("./FoodDonationScheduler.jsx")
       .then((res) => res.text())
       .then((source) => {
+        const importMatch = source.match(/import\s+React\s*,?\s*\{([^}]*)\}\s*from\s*["']react["'];?/);
+        const hookNames = importMatch ? importMatch[1] : "";
         const inlineable = source
-          .replace(/^import React.*from ["']react["'];?\s*$/m, "const { useEffect, useMemo, useState } = React;")
-          .replace("export default function FoodDonationScheduler", "function FoodDonationScheduler");
+          .replace(/import\s+React\s*,?\s*\{[^}]*\}\s*from\s*["']react["'];?/, `const {${hookNames}} = React;`)
+          .replace(/export\s+default\s+function\s+FoodDonationScheduler/, "function FoodDonationScheduler");
         const { code } = Babel.transform(inlineable, { presets: ["react"] });
         // eslint-disable-next-line no-eval
         (0, eval)(code);
