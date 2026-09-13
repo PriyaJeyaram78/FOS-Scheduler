@@ -318,3 +318,171 @@ main {
     grid-template-columns: repeat(3, 1fr);
   }
 }
+
+/* ---------- fretboard drill ---------- */
+
+.drill-settings {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1rem 1.25rem 1.25rem;
+  margin: 0 0 1.5rem;
+}
+
+.drill-settings legend {
+  padding: 0 0.5rem;
+  color: var(--text-dim);
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.drill-settings:disabled,
+.drill-settings[disabled] {
+  opacity: 0.5;
+}
+
+.string-picker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.25rem;
+  margin-bottom: 1rem;
+}
+
+.string-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.9rem;
+  color: var(--text);
+  cursor: pointer;
+}
+
+.fret-range-picker {
+  display: flex;
+  gap: 1.5rem;
+  font-size: 0.9rem;
+}
+
+.fret-range-picker label {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  cursor: pointer;
+}
+
+.drill-prompt {
+  text-align: center;
+  font-size: clamp(1.5rem, 5vw, 2.1rem);
+  font-weight: 700;
+  margin-top: 0.5rem;
+}
+
+.drill-feedback {
+  text-align: center;
+  min-height: 1.6em;
+  margin: 0.5rem 0 1.5rem;
+  font-size: 1.1rem;
+  color: var(--text-dim);
+}
+
+.drill-feedback.correct {
+  color: var(--good);
+  font-weight: 700;
+}
+
+.drill-feedback.wrong {
+  color: var(--sharp-color);
+}
+
+.fretboard {
+  display: grid;
+  gap: 2px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+  overflow-x: auto;
+}
+
+.fret-header {
+  background: var(--surface-2);
+  color: var(--text-dim);
+  font-size: 0.75rem;
+  text-align: center;
+  padding: 0.4rem 0.2rem;
+  position: relative;
+}
+
+.inlay-dot {
+  display: block;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--text-dim);
+  margin: 3px auto 0;
+}
+
+.string-label {
+  background: var(--surface-2);
+  color: var(--text-dim);
+  font-size: 0.75rem;
+  display: flex;
+  align-items: center;
+  padding: 0 0.6rem;
+  white-space: nowrap;
+}
+
+.fret-cell {
+  background: var(--surface);
+  min-height: 2.4rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.fret-cell.open-string {
+  border-left: 3px solid var(--text-dim);
+}
+
+.fret-cell.target::after {
+  content: '';
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 10px var(--accent);
+}
+
+.fret-cell.target.correct::after {
+  background: var(--good);
+  box-shadow: 0 0 14px var(--good);
+}
+
+.drill-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 1.5rem;
+}
+
+.drill-score {
+  font-size: 1.1rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.secondary-btn {
+  background: transparent;
+  color: var(--text-dim);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 0.5rem 1.25rem;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.secondary-btn:hover {
+  border-color: var(--accent);
+  color: var(--text);
+}

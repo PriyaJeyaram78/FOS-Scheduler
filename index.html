@@ -11,7 +11,7 @@
     <h1>FretWise</h1>
     <nav class="tabs">
       <button class="tab-btn active" data-tab="tuner">Tuner</button>
-      <button class="tab-btn" data-tab="drill" disabled title="Coming soon">Fretboard Drill</button>
+      <button class="tab-btn" data-tab="drill">Fretboard Drill</button>
       <button class="tab-btn" data-tab="timing" disabled title="Coming soon">Timing Trainer</button>
       <button class="tab-btn" data-tab="log" disabled title="Coming soon">Practice Log</button>
     </nav>
@@ -49,10 +49,43 @@
 
       <div class="string-reference" id="string-reference"></div>
     </section>
+
+    <section id="drill-view" class="view">
+      <div class="instrument-select" id="drill-instrument-select">
+        <button class="instrument-btn active" data-instrument="guitar">Guitar</button>
+        <button class="instrument-btn" data-instrument="bass">Bass</button>
+      </div>
+
+      <fieldset class="drill-settings" id="drill-settings">
+        <legend>Drill settings</legend>
+        <div class="string-picker" id="drill-string-picker"></div>
+        <div class="fret-range-picker">
+          <label><input type="radio" name="fret-range" value="5" checked /> Frets 0-5</label>
+          <label><input type="radio" name="fret-range" value="12" /> Frets 0-12</label>
+        </div>
+      </fieldset>
+
+      <div class="mic-controls">
+        <button id="drill-toggle" class="primary-btn">Start Drill</button>
+        <p id="drill-status" class="status-text">Microphone off</p>
+      </div>
+
+      <div class="drill-prompt" id="drill-prompt">Press Start Drill to begin</div>
+      <div class="drill-feedback" id="drill-feedback"></div>
+
+      <div class="fretboard" id="fretboard"></div>
+
+      <div class="drill-footer">
+        <div class="drill-score" id="drill-score">Score: 0 / 0</div>
+        <button id="drill-skip" class="secondary-btn">Skip</button>
+      </div>
+    </section>
   </main>
 
   <script src="js/pitch-detect.js"></script>
   <script src="js/notes.js"></script>
+  <script src="js/app.js"></script>
   <script src="js/tuner.js"></script>
+  <script src="js/drill.js"></script>
 </body>
 </html>

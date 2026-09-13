@@ -9,28 +9,8 @@
 
 const IN_TUNE_CENTS = 5; // within +-5 cents counts as "in tune", per spec
 
-// Guitar and bass need different analysis settings because a bass string
-// vibrates much slower. Standard bass low E (E1, ~41 Hz) has almost exactly
-// half the frequency of guitar low E (E2, ~82 Hz) — so its period is twice
-// as long, and the analysis window has to be twice as long too, or there
-// wouldn't be enough repeated cycles inside it for autocorrelation to find
-// a confident match. minFreq/maxFreq are the range detectPitch() searches;
-// fftSize is the number of audio samples captured per analysis window.
-const INSTRUMENTS = {
-  guitar: {
-    tuning: STANDARD_TUNING,
-    minFreq: 70,
-    maxFreq: 1400,
-    fftSize: 2048, // ~43-46ms window, 3-4 periods of the lowest note (E2)
-  },
-  bass: {
-    tuning: BASS_TUNING,
-    minFreq: 35,
-    maxFreq: 500,
-    fftSize: 4096, // ~85-93ms window, 3-4 periods of the lowest note (E1)
-  },
-};
-
+// INSTRUMENTS (guitar/bass analysis settings) lives in notes.js since
+// drill.js needs it too.
 let currentInstrument = 'guitar';
 
 let audioContext = null;
