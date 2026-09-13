@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Food Donation Sign-Up</title>
+</head>
+<body>
+  <!--
+    Standalone preview harness for FoodDonationScheduler.jsx — lets you view
+    the component in a plain browser with no build step. Serve this folder
+    with any static server (file:// won't work, since it blocks fetch()):
+
+      npx serve .
+      # or: python3 -m http.server
+
+    This harness fetches the component's source, strips its `import`/
+    `export` lines (a real React app's bundler handles those instead), and
+    runs the rest through Babel in the browser. Before using for real,
+    paste your Apps Script /exec URL into APPS_SCRIPT_URL at the top of
+    FoodDonationScheduler.jsx.
+  -->
+  <div id="root">Loading…</div>
+
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <script>
+    fetch("./FoodDonationScheduler.jsx")
+      .then((res) => res.text())
+      .then((source) => {
+        const inlineable = source
+          .replace(/^import React.*from ["']react["'];?\s*$/m, "const { useEffect, useMemo, useState } = React;")
+          .replace("export default function FoodDonationScheduler", "function FoodDonationScheduler");
+        const { code } = Babel.transform(inlineable, { presets: ["react"] });
+        // eslint-disable-next-line no-eval
+        (0, eval)(code);
+        ReactDOM.createRoot(document.getElementById("root")).render(
+          React.createElement(FoodDonationScheduler)
+        );
+      })
+      .catch((err) => {
+        document.getElementById("root").textContent =
+          "Failed to load FoodDonationScheduler.jsx: " + err.message;
+        console.error(err);
+      });
+  </script>
+</body>
+</html>
