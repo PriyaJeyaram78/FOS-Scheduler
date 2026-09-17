@@ -17,7 +17,7 @@
  * doesn't exist yet, with header row: id, date, fullName, email, items, createdAt.
  */
 
-const DEFAULT_CAP = 5;
+const DEFAULT_CAP = 1;
 const DEFAULT_SHEET_NAME = "Signups";
 const HEADERS = ["id", "date", "fullName", "email", "items", "createdAt"];
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
