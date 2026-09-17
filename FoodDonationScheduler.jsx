@@ -138,7 +138,6 @@ export default function FoodDonationScheduler() {
 
   const selectedCount = selectedDate ? countsByDate[selectedDate] || 0 : 0;
   const selectedIsFull = selectedCount >= cap;
-  const selectedIsPast = selectedDate ? selectedDate < today : false;
 
   function goToMonth(delta) {
     let y = viewYear;
@@ -154,8 +153,7 @@ export default function FoodDonationScheduler() {
     setViewMonth(m);
   }
 
-  function openDay(iso, isPast) {
-    if (isPast) return;
+  function openDay(iso) {
     setSelectedDate(iso);
     setFormState({ fullName: "", email: "", items: "" });
     setFormErrors({});
@@ -179,7 +177,7 @@ export default function FoodDonationScheduler() {
 
   async function handleSubmit(e) {
     e.preventDefault();
-    if (selectedIsFull || selectedIsPast || !selectedDate) return;
+    if (selectedIsFull || !selectedDate) return;
 
     const errors = validateForm();
     setFormErrors(errors);
@@ -285,7 +283,6 @@ export default function FoodDonationScheduler() {
             <span className="fds-legend-item"><i className="fds-swatch fds-swatch--open" /> Open</span>
             <span className="fds-legend-item"><i className="fds-swatch fds-swatch--partial" /> Filling up</span>
             <span className="fds-legend-item"><i className="fds-swatch fds-swatch--full" /> Full</span>
-            <span className="fds-legend-item"><i className="fds-swatch fds-swatch--past" /> Past</span>
           </div>
 
           <div className="fds-calendar">
@@ -307,12 +304,10 @@ export default function FoodDonationScheduler() {
                   if (day === null) return <div className="fds-day fds-day--empty" key={di} />;
                   const iso = toISODate(viewYear, viewMonth, day);
                   const count = countsByDate[iso] || 0;
-                  const isPast = iso < today;
                   const isToday = iso === today;
                   const isFull = count >= cap;
                   let status = "open";
-                  if (isPast) status = "past";
-                  else if (isFull) status = "full";
+                  if (isFull) status = "full";
                   else if (count > 0) status = "partial";
 
                   return (
@@ -320,8 +315,7 @@ export default function FoodDonationScheduler() {
                       key={di}
                       type="button"
                       className={`fds-day fds-day--${status}${isToday ? " fds-day--today" : ""}`}
-                      onClick={() => openDay(iso, isPast)}
-                      disabled={isPast}
+                      onClick={() => openDay(iso)}
                       aria-label={`${formatDateLong(iso)}, ${count} of ${cap} signed up${isFull ? ", full" : ""}`}
                     >
                       <span className="fds-day-num">{day}</span>
@@ -384,9 +378,7 @@ export default function FoodDonationScheduler() {
             </section>
 
             <section className="fds-signup-form">
-              {selectedIsPast ? (
-                <p className="fds-empty-state">This date has passed.</p>
-              ) : confirmation ? (
+              {confirmation ? (
                 <div className="fds-banner fds-banner--success">{confirmation}</div>
               ) : selectedIsFull ? (
                 <div className="fds-banner fds-banner--full">
@@ -453,8 +445,6 @@ const CSS = `
   --fds-partial-border: #e8ac2e;
   --fds-full: #fbe9e9;
   --fds-full-border: #d9605f;
-  --fds-past: #eeeae5;
-  --fds-past-border: #cabfb2;
   --fds-radius: 14px;
 
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
@@ -504,7 +494,6 @@ const CSS = `
 .fds-swatch--open { background: var(--fds-open); border-color: var(--fds-open-border); }
 .fds-swatch--partial { background: var(--fds-partial); border-color: var(--fds-partial-border); }
 .fds-swatch--full { background: var(--fds-full); border-color: var(--fds-full-border); }
-.fds-swatch--past { background: var(--fds-past); border-color: var(--fds-past-border); }
 
 .fds-calendar {
   background: #fff;
@@ -567,7 +556,6 @@ const CSS = `
 .fds-day--partial { background: var(--fds-partial); border-color: var(--fds-partial-border); }
 .fds-day--full { background: var(--fds-full); border-color: var(--fds-full-border); }
 .fds-day--full .fds-day-count { color: #9c3a3a; font-weight: 700; }
-.fds-day--past { background: var(--fds-past); border-color: var(--fds-past-border); color: #a89e92; cursor: not-allowed; }
 .fds-day--today { outline: 2px solid var(--fds-accent); outline-offset: -2px; }
 
 .fds-modal-backdrop {

@@ -5,7 +5,7 @@
  *   1. In your Google Sheet: Extensions > Apps Script.
  *   2. Replace the default Code.gs contents with this file.
  *   3. (Optional) Project Settings (gear icon) > Script Properties > add:
- *        DAILY_CAP  - max sign-ups per day (default 5)
+ *        DAILY_CAP  - max sign-ups per day (default 1)
  *        SHEET_NAME - tab name to store sign-ups in (default "Signups")
  *   4. Deploy > New deployment > Web app.
  *        Execute as: Me
