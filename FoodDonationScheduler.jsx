@@ -8,11 +8,11 @@
 //
 // Expected Apps Script contract:
 //   GET  <url>                                  -> { ok, cap, signups: [{ id, date, fullName, email, items, createdAt }] }
-//   POST <url>  { fullName, email, items, date, passcode }        -> { ok: true } | { ok: false, error }
-//   POST <url>  { action: "delete", id, passcode }                -> { ok: true } | { ok: false, error }
-// The server is the source of truth for the daily cap, the duplicate-email
-// rule, and the passcode — this component only mirrors that logic for a
-// responsive UI and always defers to the server's response.
+//   POST <url>  { fullName, email, items, date }        -> { ok: true } | { ok: false, error }
+//   POST <url>  { action: "delete", id }                -> { ok: true } | { ok: false, error }
+// The server is the source of truth for the daily cap and the duplicate-
+// email rule — this component only mirrors that logic for a responsive UI
+// and always defers to the server's response.
 //
 // CORS note: Apps Script doesn't answer CORS preflight requests, so every
 // POST below is sent with Content-Type "text/plain;charset=utf-8" (still a
@@ -86,17 +86,14 @@ export default function FoodDonationScheduler() {
   const [reloadTick, setReloadTick] = useState(0);
 
   const [selectedDate, setSelectedDate] = useState(null);
-  const [passcode, setPasscode] = useState("");
 
   const [formState, setFormState] = useState({ fullName: "", email: "", items: "" });
   const [formErrors, setFormErrors] = useState({});
-  const [passcodeError, setPasscodeError] = useState("");
   const [formBanner, setFormBanner] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [confirmation, setConfirmation] = useState("");
 
   const [removingId, setRemovingId] = useState(null);
-  const [removePasscode, setRemovePasscode] = useState("");
   const [removeError, setRemoveError] = useState("");
   const [removing, setRemoving] = useState(false);
 
@@ -162,7 +159,6 @@ export default function FoodDonationScheduler() {
     setSelectedDate(iso);
     setFormState({ fullName: "", email: "", items: "" });
     setFormErrors({});
-    setPasscodeError("");
     setFormBanner("");
     setConfirmation("");
     setRemovingId(null);
@@ -178,7 +174,6 @@ export default function FoodDonationScheduler() {
     if (!formState.fullName.trim()) errors.fullName = "Please enter your name.";
     if (!formState.email.trim()) errors.email = "Please enter your email.";
     else if (!EMAIL_RE.test(formState.email.trim())) errors.email = "Please enter a valid email address.";
-    if (!passcode.trim()) errors.passcode = "Please enter the donor passcode.";
     return errors;
   }
 
@@ -188,7 +183,6 @@ export default function FoodDonationScheduler() {
 
     const errors = validateForm();
     setFormErrors(errors);
-    setPasscodeError("");
     setFormBanner("");
     if (Object.keys(errors).length) return;
 
@@ -199,7 +193,6 @@ export default function FoodDonationScheduler() {
         email: formState.email.trim(),
         items: formState.items.trim(),
         date: selectedDate,
-        passcode,
       };
       const result = await postToSheet(payload);
       if (result && result.ok) {
@@ -217,9 +210,7 @@ export default function FoodDonationScheduler() {
         setConfirmation(`Thanks, ${newSignup.fullName}! You're signed up for ${formatDateLong(selectedDate)}.`);
         setFormState({ fullName: "", email: "", items: "" });
       } else {
-        const message = (result && result.error) || "Something went wrong. Please try again.";
-        if (/passcode/i.test(message)) setPasscodeError("Incorrect passcode");
-        else setFormBanner(message);
+        setFormBanner((result && result.error) || "Something went wrong. Please try again.");
       }
     } catch (err) {
       setFormBanner("Network error — please try again.");
@@ -230,7 +221,6 @@ export default function FoodDonationScheduler() {
 
   function startRemove(id) {
     setRemovingId(id);
-    setRemovePasscode(passcode);
     setRemoveError("");
   }
 
@@ -240,21 +230,15 @@ export default function FoodDonationScheduler() {
   }
 
   async function confirmRemove(id) {
-    if (!removePasscode.trim()) {
-      setRemoveError("Please enter the donor passcode.");
-      return;
-    }
     setRemoving(true);
     setRemoveError("");
     try {
-      const result = await postToSheet({ action: "delete", id, passcode: removePasscode });
+      const result = await postToSheet({ action: "delete", id });
       if (result && result.ok) {
         setSignups((prev) => prev.filter((s) => s.id !== id));
-        setPasscode(removePasscode);
         setRemovingId(null);
       } else {
-        const message = (result && result.error) || "Couldn't remove that sign-up.";
-        setRemoveError(/passcode/i.test(message) ? "Incorrect passcode" : message);
+        setRemoveError((result && result.error) || "Couldn't remove that sign-up.");
       }
     } catch (err) {
       setRemoveError("Network error — please try again.");
@@ -377,12 +361,6 @@ export default function FoodDonationScheduler() {
 
                     {removingId === s.id ? (
                       <div className="fds-remove-confirm">
-                        <input
-                          type="password"
-                          placeholder="Passcode"
-                          value={removePasscode}
-                          onChange={(e) => setRemovePasscode(e.target.value)}
-                        />
                         <button
                           className="fds-secondary-btn"
                           disabled={removing}
@@ -447,18 +425,6 @@ export default function FoodDonationScheduler() {
                       value={formState.items}
                       onChange={(e) => setFormState((f) => ({ ...f, items: e.target.value }))}
                     />
-                  </label>
-
-                  <label className="fds-field">
-                    <span>Donor passcode</span>
-                    <input
-                      type="password"
-                      value={passcode}
-                      onChange={(e) => setPasscode(e.target.value)}
-                    />
-                    {(formErrors.passcode || passcodeError) && (
-                      <div className="fds-field-error">{passcodeError || formErrors.passcode}</div>
-                    )}
                   </label>
 
                   <button type="submit" className="fds-primary-btn" disabled={submitting}>
@@ -680,13 +646,6 @@ const CSS = `
 .fds-remove-btn { text-decoration: underline; }
 
 .fds-remove-confirm { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
-.fds-remove-confirm input {
-  border: 1px solid var(--fds-past-border);
-  border-radius: 8px;
-  padding: 8px 10px;
-  font: inherit;
-  width: 110px;
-}
 
 .fds-field { display: flex; flex-direction: column; gap: 4px; margin-bottom: 12px; font-size: 0.9rem; }
 .fds-field span { font-weight: 600; }

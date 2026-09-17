@@ -4,12 +4,9 @@
  * Setup:
  *   1. In your Google Sheet: Extensions > Apps Script.
  *   2. Replace the default Code.gs contents with this file.
- *   3. Project Settings (gear icon) > Script Properties > add:
- *        PASSCODE   - the shared donor passcode (required)
- *        DAILY_CAP  - max sign-ups per day (optional, default 5)
- *        SHEET_NAME - tab name to store sign-ups in (optional, default "Signups")
- *      (Keeping the passcode in Script Properties, not in this file, means
- *      it can be rotated without touching code, and isn't in your git history.)
+ *   3. (Optional) Project Settings (gear icon) > Script Properties > add:
+ *        DAILY_CAP  - max sign-ups per day (default 5)
+ *        SHEET_NAME - tab name to store sign-ups in (default "Signups")
  *   4. Deploy > New deployment > Web app.
  *        Execute as: Me
  *        Who has access: Anyone
@@ -29,7 +26,6 @@ const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 function getConfig_() {
   const props = PropertiesService.getScriptProperties();
   return {
-    passcode: props.getProperty("PASSCODE") || "",
     cap: Number(props.getProperty("DAILY_CAP")) || DEFAULT_CAP,
     sheetName: props.getProperty("SHEET_NAME") || DEFAULT_SHEET_NAME,
   };
@@ -86,9 +82,6 @@ function doPost(e) {
   lock.waitLock(10000);
   try {
     const config = getConfig_();
-    if (!config.passcode) {
-      return jsonOutput_({ ok: false, error: "Server is not configured with a passcode yet." });
-    }
 
     let body;
     try {
@@ -111,11 +104,7 @@ function handleAdd_(sheet, config, body) {
   const email = String(body.email || "").trim();
   const items = String(body.items || "").trim();
   const date = String(body.date || "").trim();
-  const passcode = String(body.passcode || "");
 
-  if (passcode !== config.passcode) {
-    return jsonOutput_({ ok: false, error: "Incorrect passcode." });
-  }
   if (!fullName) {
     return jsonOutput_({ ok: false, error: "Full name is required." });
   }
@@ -142,11 +131,7 @@ function handleAdd_(sheet, config, body) {
 
 function handleDelete_(sheet, config, body) {
   const id = String(body.id || "");
-  const passcode = String(body.passcode || "");
 
-  if (passcode !== config.passcode) {
-    return jsonOutput_({ ok: false, error: "Incorrect passcode." });
-  }
   if (!id) {
     return jsonOutput_({ ok: false, error: "Missing sign-up id." });
   }
