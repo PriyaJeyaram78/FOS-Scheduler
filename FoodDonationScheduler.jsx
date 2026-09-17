@@ -22,7 +22,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 
 // TODO: paste your deployed Google Apps Script web app URL here.
-const APPS_SCRIPT_URL = "<PASTE YOUR /exec URL>";
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwdjKk_PKsK-SsMU8RvJ9T4b867SKULTzu9s-h47g2YmYQUqNsrGZih3Vr-Co7IjiD4oQ/exec";
 
 const DEFAULT_CAP = 5;
 const WEEKDAY_LABELS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
